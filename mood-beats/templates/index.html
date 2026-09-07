@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block title %}Mood Beats — Find your sound{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <p class="hero-eyebrow">Face. Words. Voice. One playlist.</p>
+  <h1 class="hero-title">Show it, say it, or type it.</h1>
+  <p class="hero-sub">Mood Beats reads your face through the camera, your typed
+    or spoken words through sentiment analysis, and fuses every signal it
+    gets into one mood — then pulls matching tracks with real previews.</p>
+</section>
+
+<section class="panel">
+  <form method="POST" class="mood-form" id="mood-form">
+
+    <div class="modal-grid">
+
+      <!-- ---- Facial signal ---- -->
+      <div class="modal-card" id="face-card">
+        <div class="modal-head">
+          <span class="modal-icon">📷</span>
+          <div>
+            <h3>Facial expression</h3>
+            <p>Reads your dominant expression, live, in the browser.</p>
+          </div>
+        </div>
+        <div class="cam-wrap">
+          <video id="cam-video" autoplay muted playsinline></video>
+          <div class="cam-overlay" id="cam-status">Camera off</div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="cta-ghost cta-small" id="cam-toggle">Enable camera</button>
+          <span class="reading" id="face-reading">No reading yet</span>
+        </div>
+      </div>
+
+      <!-- ---- Text signal ---- -->
+      <div class="modal-card">
+        <div class="modal-head">
+          <span class="modal-icon">💬</span>
+          <div>
+            <h3>Type how you feel</h3>
+            <p>A sentence is enough — sentiment analysis does the rest.</p>
+          </div>
+        </div>
+        <textarea name="text_mood" id="text_mood" rows="4"
+          placeholder="e.g. &quot;so tired but I have to push through this deadline&quot;"></textarea>
+      </div>
+
+      <!-- ---- Voice signal ---- -->
+      <div class="modal-card">
+        <div class="modal-head">
+          <span class="modal-icon">🎤</span>
+          <div>
+            <h3>Or just say it</h3>
+            <p>Speech is transcribed in the browser, then read the same way as text.</p>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="cta-ghost cta-small" id="mic-toggle">Start recording</button>
+          <span class="reading" id="voice-reading">Not used</span>
+        </div>
+        <input type="hidden" name="voice_mood" id="voice_mood" value="">
+      </div>
+    </div>
+
+    <input type="hidden" name="face_emotion" id="face_emotion" value="">
+    <input type="hidden" name="face_confidence" id="face_confidence" value="">
+
+    <button type="submit" class="cta">Detect my mood</button>
+
+    <details class="manual-fallback">
+      <summary>Prefer manual control? Set mood sliders instead</summary>
+      <div class="slider-row">
+        <div class="slider-label"><span>Energy</span><output id="energy-out" for="energy">5</output></div>
+        <input type="range" min="1" max="10" step="1" name="energy" id="energy" value="5"
+               oninput="document.getElementById('energy-out').value = this.value">
+        <div class="slider-scale"><span>Chill</span><span>Wired</span></div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-label"><span>Danceability</span><output id="dance-out" for="danceability">5</output></div>
+        <input type="range" min="1" max="10" step="1" name="danceability" id="danceability" value="5"
+               oninput="document.getElementById('dance-out').value = this.value">
+        <div class="slider-scale"><span>Sit still</span><span>Can't stop</span></div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-label"><span>Valence</span><output id="valence-out" for="valence">5</output></div>
+        <input type="range" min="1" max="10" step="1" name="valence" id="valence" value="5"
+               oninput="document.getElementById('valence-out').value = this.value">
+        <div class="slider-scale"><span>Heavy</span><span>Bright</span></div>
+      </div>
+      <p class="hint">Sliders are only used if the camera, text box and mic are all left empty.</p>
+    </details>
+  </form>
+
+  {% if error %}
+    <p class="error">{{ error }}</p>
+  {% endif %}
+</section>
+
+{% if mood %}
+<section class="results">
+  <h2 class="results-title">Reads as <span class="mood-pill mood-{{ mood|lower }}">{{ mood }}</span></h2>
+
+  {% if modalities %}
+  <div class="fusion-summary">
+    <span class="fusion-label">Fused from:</span>
+    {% for m in modalities.split('+') %}
+      <span class="source-chip source-{{ m }}">{{ m }}</span>
+    {% endfor %}
+    {% if breakdown.face %}<span class="fusion-detail">face read as <strong>{{ breakdown.face.emotion }}</strong></span>{% endif %}
+    {% if breakdown.text %}<span class="fusion-detail">text sentiment</span>{% endif %}
+    {% if breakdown.voice %}<span class="fusion-detail">voice sentiment</span>{% endif %}
+    {% if breakdown.manual %}<span class="fusion-detail">manual sliders</span>{% endif %}
+  </div>
+  {% endif %}
+
+  <div class="song-grid">
+    {% for song in songs %}
+    <article class="song-card">
+      <div class="song-art">
+        {% if song.audio_url %}<span class="live-badge">Preview</span>{% endif %}
+        <img src="{{ song.image_url }}" alt="{{ song.name }} cover art" loading="lazy">
+      </div>
+      <div class="song-body">
+        <h3>{{ song.name }}</h3>
+        <p class="artist">{{ song.artist }}</p>
+
+        <audio controls preload="none" class="local-audio"
+               data-name="{{ song.name }}"
+               data-artist="{{ song.artist }}"
+               data-mood="{{ mood }}"
+               data-image="{{ song.image_url }}"
+               data-spotify-url="{{ song.spotify_url or '' }}">
+          <source src="{{ song.audio_url }}" type="audio/mpeg">
+          Your browser can't play this audio file.
+        </audio>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+<script src="{{ url_for('static', filename='js/mood_detect.js') }}"></script>
+<script src="{{ url_for('static', filename='js/player.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Mood Beats — History{% endblock %}
+
+{% block content %}
+<section class="hero hero-compact">
+  <p class="hero-eyebrow">Every session, saved</p>
+  <h1 class="hero-title">Your mood, over time.</h1>
+</section>
+
+{% if cleared %}
+  <p class="notice">History cleared.</p>
+{% endif %}
+
+{% if recent_plays %}
+<section class="recent-plays">
+  <h2>Last 3 listened</h2>
+  <div class="recent-plays-list">
+    {% for play in recent_plays %}
+    <div class="recent-play-card">
+      <img src="{{ play.image_url or url_for('static', filename='img/music-bg.svg') }}" alt="">
+      <div class="recent-play-info">
+        <div class="name">{{ play.name }}</div>
+        <div class="artist">{{ play.artist }}</div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if mood_counts %}
+<section class="mood-summary">
+  {% for mood, count in mood_counts.items() %}
+  <div class="mood-stat">
+    <span class="mood-pill mood-{{ mood|lower }}">{{ mood }}</span>
+    <span class="mood-count">{{ count }}</span>
+  </div>
+  {% endfor %}
+</section>
+{% endif %}
+
+<section class="panel history-panel">
+  {% if entries %}
+    <table class="history-table">
+      <thead>
+        <tr>
+          <th>When</th>
+          <th>Mood</th>
+          <th>Detected via</th>
+          <th>Signal detail</th>
+          <th>Top pick</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for entry in entries %}
+        <tr>
+          <td>{{ entry.created_at.replace('T', ' ') }}</td>
+          <td><span class="mood-pill mood-{{ entry.mood|lower }}">{{ entry.mood }}</span></td>
+          <td>
+            {% for m in entry.modalities.split('+') %}
+              <span class="source-chip source-{{ m }}">{{ m }}</span>
+            {% endfor %}
+          </td>
+          <td class="signal-detail">
+            {% if entry.breakdown.face %}Face: {{ entry.breakdown.face.emotion }}<br>{% endif %}
+            {% if entry.breakdown.text %}Text: “{{ entry.breakdown.text.input[:40] }}{% if entry.breakdown.text.input|length > 40 %}…{% endif %}”<br>{% endif %}
+            {% if entry.breakdown.voice %}Voice: “{{ entry.breakdown.voice.input[:40] }}{% if entry.breakdown.voice.input|length > 40 %}…{% endif %}”<br>{% endif %}
+            {% if entry.breakdown.manual %}Sliders: E{{ entry.breakdown.manual.energy|int }}/D{{ entry.breakdown.manual.danceability|int }}/V{{ entry.breakdown.manual.valence|int }}{% endif %}
+          </td>
+          <td>
+            {% if entry.songs %}
+              {{ entry.songs[0].name }} — {{ entry.songs[0].artist }}
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <form method="POST" action="{{ url_for('clear_history') }}" class="clear-form"
+          onsubmit="return confirm('Clear all saved history? This can\'t be undone.');">
+      <button type="submit" class="cta cta-ghost">Clear history</button>
+    </form>
+  {% else %}
+    <p class="empty-state">No predictions yet — <a href="{{ url_for('index') }}">find your mood</a> to start building history.</p>
+  {% endif %}
+</section>
+{% endblock %}

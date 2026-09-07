@@ -1,0 +1,54 @@
+<svg width="1600" height="1000" viewBox="0 0 1600 1000" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="0%" r="120%">
+      <stop offset="0%" stop-color="#2D1A46"/>
+      <stop offset="55%" stop-color="#221336"/>
+      <stop offset="100%" stop-color="#150B26"/>
+    </radialGradient>
+    <radialGradient id="vinylShine" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#3A2456"/>
+      <stop offset="100%" stop-color="#180E2B"/>
+    </radialGradient>
+    <linearGradient id="waveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF6B4A" stop-opacity="0.55"/>
+      <stop offset="50%" stop-color="#FFB238" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#52C6A0" stop-opacity="0.35"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="1000" fill="url(#bgGrad)"/>
+
+  <!-- large vinyl record, upper right -->
+  <g transform="translate(1230,120)" opacity="0.9">
+    <circle r="260" fill="url(#vinylShine)"/>
+    <circle r="260" fill="none" stroke="#F4EEE6" stroke-opacity="0.05" stroke-width="1"/>
+    <circle r="220" fill="none" stroke="#F4EEE6" stroke-opacity="0.06" stroke-width="1"/>
+    <circle r="180" fill="none" stroke="#F4EEE6" stroke-opacity="0.06" stroke-width="1"/>
+    <circle r="140" fill="none" stroke="#F4EEE6" stroke-opacity="0.07" stroke-width="1"/>
+    <circle r="100" fill="none" stroke="#F4EEE6" stroke-opacity="0.08" stroke-width="1"/>
+    <circle r="58" fill="#FFB238" opacity="0.85"/>
+    <circle r="10" fill="#150B26"/>
+  </g>
+
+  <!-- second, smaller vinyl bottom-left -->
+  <g transform="translate(120,900)" opacity="0.6">
+    <circle r="170" fill="url(#vinylShine)"/>
+    <circle r="130" fill="none" stroke="#F4EEE6" stroke-opacity="0.06" stroke-width="1"/>
+    <circle r="90" fill="none" stroke="#F4EEE6" stroke-opacity="0.07" stroke-width="1"/>
+    <circle r="40" fill="#FF6B4A" opacity="0.7"/>
+  </g>
+
+  <!-- waveform strip across the middle -->
+  <g transform="translate(0,560)" stroke="url(#waveGrad)" stroke-width="6" stroke-linecap="round" fill="none">
+    <path d="M0,40 L40,40 L60,10 L90,80 L120,0 L150,90 L180,20 L210,60 L240,40 L1600,40" opacity="0.5"/>
+  </g>
+
+  <!-- floating music notes, sparse and subtle -->
+  <g fill="#F4EEE6" opacity="0.06">
+    <text x="90" y="220" font-size="90" font-family="Georgia, serif">&#9835;</text>
+    <text x="1420" y="620" font-size="70" font-family="Georgia, serif">&#9834;</text>
+    <text x="700" y="140" font-size="55" font-family="Georgia, serif">&#9833;</text>
+    <text x="960" y="900" font-size="80" font-family="Georgia, serif">&#9835;</text>
+    <text x="330" y="700" font-size="46" font-family="Georgia, serif">&#9834;</text>
+  </g>
+</svg>
